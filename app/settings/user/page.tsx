@@ -1,30 +1,35 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useRouter } from 'next/navigation';
-import type { RootState, AppDispatch } from '@/store/store';
-import { Button } from '@/components/ui/Button';
-import Image from 'next/image';
-import axios from 'axios';
-import { updateUser } from '@/store/features/authSlice';
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import type { RootState, AppDispatch } from "@/store/store";
+import { Button } from "@/components/ui/Button";
+import Image from "next/image";
+import axios from "axios";
+import { updateUser } from "@/store/features/authSlice";
 
 // Template avatarlar
 const templateAvatars = [
-  '/avatars/template1.jpg',
-  '/avatars/template2.jpg',
-  '/avatars/template3.jpg',
+  "/avatars/template1.jpg",
+  "/avatars/template2.jpg",
+  "/avatars/template3.jpg",
+  "/avatars/template4.jpg",
+  "/avatars/template5.jpg",
+  "/avatars/template6.jpg",
+  "/avatars/template7.jpg",
+  "/avatars/template8.jpg",
 ];
 
 export default function SettingsPage() {
   const { user } = useSelector((state: RootState) => state.auth);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
-  const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [name, setName] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -37,24 +42,26 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (isClient && !user) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [isClient, user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
-      const result = await dispatch(updateUser({
-        name,
-        avatar: avatarUrl || avatar,
-      })).unwrap();
+      const result = await dispatch(
+        updateUser({
+          name,
+          avatar: avatarUrl || avatar,
+        })
+      ).unwrap();
 
-      setMessage('Profil başarıyla güncellendi!');
+      setMessage("Profil başarıyla güncellendi!");
     } catch (error: any) {
-      setMessage(error || 'Bir hata oluştu');
+      setMessage(error || "Bir hata oluştu");
     } finally {
       setIsLoading(false);
     }
@@ -62,11 +69,15 @@ export default function SettingsPage() {
 
   const selectTemplateAvatar = (templateUrl: string) => {
     setAvatar(templateUrl);
-    setAvatarUrl('');
+    setAvatarUrl("");
   };
 
   if (!isClient || !user) {
-    return <div className="flex justify-center items-center min-h-screen">Yükleniyor...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Yükleniyor...
+      </div>
+    );
   }
 
   return (
@@ -74,13 +85,15 @@ export default function SettingsPage() {
       <div className="w-full max-w-md space-y-8 bg-card p-8 rounded-lg shadow-lg">
         <div className="text-center">
           <h2 className="text-3xl font-bold">Profil Ayarları</h2>
-          <p className="text-muted-foreground mt-2">Profil bilgilerinizi güncelleyin</p>
+          <p className="text-muted-foreground mt-2">
+            Profil bilgilerinizi güncelleyin
+          </p>
         </div>
 
         <div className="flex justify-center">
           <div className="relative w-32 h-32 rounded-full overflow-hidden">
             <Image
-              src={avatar || '/avatars/default.png'}
+              src={avatar || "/avatars/default.png"}
               alt="Profil resmi"
               fill
               className="object-cover"
@@ -90,7 +103,10 @@ export default function SettingsPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-muted-foreground">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-muted-foreground"
+            >
               İsim
             </label>
             <input
@@ -114,7 +130,9 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => selectTemplateAvatar(templateUrl)}
                   className={`relative w-16 h-16 rounded-full overflow-hidden border-2 ${
-                    avatar === templateUrl ? 'border-primary' : 'border-transparent'
+                    avatar === templateUrl
+                      ? "border-primary"
+                      : "border-transparent"
                   }`}
                 >
                   <Image
@@ -129,7 +147,10 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label htmlFor="avatarUrl" className="block text-sm font-medium text-muted-foreground">
+            <label
+              htmlFor="avatarUrl"
+              className="block text-sm font-medium text-muted-foreground"
+            >
               Avatar URL (İsteğe bağlı)
             </label>
             <input
@@ -143,20 +164,20 @@ export default function SettingsPage() {
           </div>
 
           {message && (
-            <p className={`text-sm ${message.includes('hata') ? 'text-destructive' : 'text-green-500'}`}>
+            <p
+              className={`text-sm ${
+                message.includes("hata") ? "text-destructive" : "text-green-500"
+              }`}
+            >
               {message}
             </p>
           )}
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Güncelleniyor...' : 'Kaydet'}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Güncelleniyor..." : "Kaydet"}
           </Button>
         </form>
       </div>
     </div>
   );
-} 
+}
