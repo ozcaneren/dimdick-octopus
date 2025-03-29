@@ -25,7 +25,6 @@ const initialState: AuthState = {
   message: '',
 };
 
-// Kullanıcı kaydı
 export const register = createAsyncThunk(
   'auth/register',
   async (userData: { name: string; email: string; password: string }, thunkAPI) => {
@@ -41,7 +40,6 @@ export const register = createAsyncThunk(
   }
 );
 
-// Kullanıcı girişi
 export const login = createAsyncThunk(
   'auth/login',
   async (userData: { email: string; password: string }, thunkAPI) => {
@@ -57,7 +55,6 @@ export const login = createAsyncThunk(
   }
 );
 
-// Kullanıcı güncelleme
 export const updateUser = createAsyncThunk(
   'auth/update',
   async (userData: { name: string; avatar?: string }, thunkAPI: any) => {
@@ -74,7 +71,11 @@ export const updateUser = createAsyncThunk(
       const response = await axios.put('/api/user/update', userData, config);
       
       if (response.data) {
-        const updatedUser = { ...state.auth.user, ...response.data };
+        const updatedUser = {
+          ...state.auth.user,
+          name: response.data.name,
+          avatar: response.data.avatar,
+        };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         return updatedUser;
       }

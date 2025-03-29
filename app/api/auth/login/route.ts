@@ -9,7 +9,6 @@ export async function POST(req: Request) {
     
     const { email, password } = await req.json();
 
-    // Kullanıcıyı bul
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
@@ -18,7 +17,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Şifreyi kontrol et
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return NextResponse.json(
@@ -27,7 +25,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // JWT token oluştur
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET!,
@@ -38,6 +35,7 @@ export async function POST(req: Request) {
       _id: user._id,
       name: user.name,
       email: user.email,
+      avatar: user.avatar,
       token,
     });
     

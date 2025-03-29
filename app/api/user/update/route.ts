@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import connectDB from '@/utils/db';
 import User from '@/models/User';
@@ -18,12 +17,10 @@ export async function PUT(req: Request) {
       );
     }
 
-    // Token'ı doğrula
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
     
     const { name, avatar } = await req.json();
 
-    // Kullanıcıyı bul ve güncelle
     const user = await User.findById(decoded.userId);
     
     if (!user) {

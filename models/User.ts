@@ -18,11 +18,10 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: '/avatars/default.png', // Varsayılan avatar
+    default: '/avatars/default.png',
   },
 }, { timestamps: true });
 
-// Şifreyi hashleme
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
     return next();
@@ -33,7 +32,6 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-// Şifre karşılaştırma metodu
 userSchema.methods.matchPassword = async function(enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

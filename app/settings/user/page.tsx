@@ -9,6 +9,8 @@ import Image from "next/image";
 import axios from "axios";
 import { updateUser } from "@/store/features/authSlice";
 
+const DEFAULT_AVATAR = "/avatars/default.png";
+
 // Template avatarlar
 const templateAvatars = [
   "/avatars/template1.jpg",
@@ -24,19 +26,19 @@ const templateAvatars = [
 export default function SettingsPage() {
   const { user } = useSelector((state: RootState) => state.auth);
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const [isClient, setIsClient] = useState(false);
   const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState("");
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     setIsClient(true);
     if (user) {
-      setName(user.name);
-      setAvatar(user.avatar);
+      setName(user.name || "");
+      setAvatar(user.avatar || DEFAULT_AVATAR);
     }
   }, [user]);
 
@@ -55,11 +57,15 @@ export default function SettingsPage() {
       const result = await dispatch(
         updateUser({
           name,
-          avatar: avatarUrl || avatar,
+          avatar: avatarUrl || avatar || DEFAULT_AVATAR,
         })
       ).unwrap();
 
-      setMessage("Profil başarıyla güncellendi!");
+      if (result) {
+        setAvatar(result.avatar || DEFAULT_AVATAR);
+        setAvatarUrl("");
+        setMessage("Profil başarıyla güncellendi!");
+      }
     } catch (error: any) {
       setMessage(error || "Bir hata oluştu");
     } finally {
@@ -72,13 +78,15 @@ export default function SettingsPage() {
     setAvatarUrl("");
   };
 
-  if (!isClient || !user) {
+  if (!isClient) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         Yükleniyor...
       </div>
     );
   }
+
+  const currentAvatar = avatar || DEFAULT_AVATAR;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -91,13 +99,17 @@ export default function SettingsPage() {
         </div>
 
         <div className="flex justify-center">
-          <div className="relative w-32 h-32 rounded-full overflow-hidden">
-            <Image
-              src={avatar || "/avatars/default.png"}
-              alt="Profil resmi"
-              fill
-              className="object-cover"
-            />
+          <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-input">
+            {isClient && currentAvatar && (
+              <Image
+                src={currentAvatar}
+                alt="Profil resmi"
+                fill
+                sizes="128px"
+                className="object-cover"
+                priority
+              />
+            )}
           </div>
         </div>
 
@@ -129,18 +141,20 @@ export default function SettingsPage() {
                   key={templateUrl}
                   type="button"
                   onClick={() => selectTemplateAvatar(templateUrl)}
-                  className={`relative w-16 h-16 rounded-full overflow-hidden border-2 ${
-                    avatar === templateUrl
-                      ? "border-primary"
-                      : "border-transparent"
+                  className={`relative w-20 h-20 rounded-full overflow-hidden border-2 ${
+                    avatar === templateUrl ? "border-primary" : "border-input"
                   }`}
                 >
-                  <Image
-                    src={templateUrl}
-                    alt="Template avatar"
-                    fill
-                    className="object-cover"
-                  />
+                  {isClient && templateUrl && (
+                    <Image
+                      src={templateUrl}
+                      alt="Template avatar"
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                      priority
+                    />
+                  )}
                 </button>
               ))}
             </div>
